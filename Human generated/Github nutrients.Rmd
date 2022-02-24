@@ -15,7 +15,7 @@ Read files
 ```{r}
 PP <- read.csv("../Read Only/PP erosion fluxes.csv")[,-1]
 
-new changes
+is this making a change
 ```
 the release of nutrients is NOT linearly related to increase sediment resuspension. Therefore a linear model is not the best way to analyse this data. A spearman analysis is more appropriate for data that presents a monotonic relationship, as it is the case here. 
 For the Spearman analysis we will compare the nutrient concentration vs mass of resuspended sediment (g/L)
