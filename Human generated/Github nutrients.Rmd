@@ -13,7 +13,7 @@ library(tidyr)
 ```
 Read files
 ```{r}
-PP <- read.csv("../Read Only/PP erosion fluxes.csv")[,-1]
+PP <- read.csv("../Read Only/PP erosion fluxes.csv")[, -1]
 ```
 the release of nutrients is NOT linearly related to increase sediment resuspension. Therefore a linear model is not the best way to analyse this data. A spearman analysis is more appropriate for data that presents a monotonic relationship, as it is the case here. 
 For the Spearman analysis we will compare the nutrient concentration vs mass of resuspended sediment (g/L)
@@ -28,112 +28,112 @@ Calculation of nutrient fluxes over the whole duration (~ 1 hour) of the erosion
 Here a different flux is calculated per each speed
 we do not kill points because we only have a maximum of three data points per replicate
 ```{r}
-# FluxSpd <- function(Data = NutEro[NutEro$Speed != 0,], Sits, nut = c("NH4", "NO2", "NO3", "PO4", "DSi"), Data.acc = PP[,c(1:3,18:20)]) {
-# 
-# Fluxes <- Sites <- Location <- Reps <- Spee <-  Nuts <- Height <- BW <- RSQ <- AICs <- NULL
-# 
-# for (s in Sits){
-#    SS       <- Data[Data$Site == s, ]
-#    Acc <- Data.acc[Data.acc$Site == s, ]
-#    Locat  <- unique(SS$Location)
-# 
-#    for (i in Locat){
-#     Acc.loc <- subset(Acc, Acc$Location == i)
-#     Loc <- subset(SS, Location == i)
-#     repli    <- unique(Loc$Replicate)
-# 
-# for (ir in 1:length(repli)){
-#       r <- repli[ir]
-#       Acc.r <- Acc.loc[ir, ]
-#       Rep <- subset(Loc, Replicate == r)
-#       Sped <- unique(Rep$Speed)
-# 
-#   for (n in 1:length(nut)){
-#     Nutname <- nut[n]
-#      FN <- NULL
-# 
-#      for (p in 1:length(Sped)) {
-#        sp <- Sped[p]
-#        Spd <- subset(Rep, Speed == sp)
-# 
-#       flux <- lm(Spd[,Nutname] ~ Spd$Timed)
-#       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-#       Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
-# 
-#       rsq  <- summary(flux)$adj.r.squared
-#       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-#       Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
-#       FN <- c(FN, Nutflux)
-# 
-#     Fluxes <- c(Fluxes, Nutflux)
-#     Sites <- c(Sites, s)
-#     Location <- c(Location, i)
-#     Reps <- c(Reps, ir)
-#     Spee <- c(Spee, sp)
-#      Nuts <- c(Nuts, Nutname)
-#      Height <- c(Height, Acc.r$HeightWat/100)
-#      RSQ <- c(RSQ, rsq)
-#     }}}}}
-#    invisible(data.frame(Site = Sites, Location = Location, Nut = Nuts, Rep = Reps, Speed = Spee,Fluxes = Fluxes, Height = Height, rsq = RSQ))
-# }
+FluxSpd <- function(Data = NutEro[NutEro$Speed != 0,], Sits, nut = c("NH4", "NO2", "NO3", "PO4", "DSi"), 
+                    Data.acc = PP[,c(1:3,18:20)]) {
+Fluxes <- Sites <- Location <- Reps <- Spee <-  Nuts <- Height <- BW <- RSQ <- AICs <- NULL
+for (s in Sits) {
+   SS       <- Data[Data$Site == s, ]
+   Acc <- Data.acc[Data.acc$Site == s, ]
+   Locat  <- unique(SS$Location)
+
+   for (i in Locat) {
+    Acc.loc <- subset(Acc, Acc$Location == i)
+    Loc <- subset(SS, Location == i)
+    repli    <- unique(Loc$Replicate)
+
+for (ir in 1:length(repli)) {
+      r <- repli[ir]
+      Acc.r <- Acc.loc[ir, ]
+      Rep <- subset(Loc, Replicate == r)
+      Sped <- unique(Rep$Speed)
+
+  for (n in 1:length(nut)) {
+    Nutname <- nut[n]
+     FN <- NULL
+
+     for (p in 1:length(Sped)) {
+       sp <- Sped[p]
+       Spd <- subset(Rep, Speed == sp)
+
+      flux <- lm(Spd[,Nutname] ~ Spd$Timed)
+      prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
+      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
+
+      rsq  <- summary(flux)$adj.r.squared
+      prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
+      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
+      FN <- c(FN, Nutflux)
+
+    Fluxes <- c(Fluxes, Nutflux)
+    Sites <- c(Sites, s)
+    Location <- c(Location, i)
+    Reps <- c(Reps, ir)
+    Spee <- c(Spee, sp)
+     Nuts <- c(Nuts, Nutname)
+     Height <- c(Height, Acc.r$HeightWat/100)
+     RSQ <- c(RSQ, rsq)
+    }}}}}
+   invisible(data.frame(Site = Sites, Location = Location, Nut = Nuts, Rep = Reps, Speed = Spee,Fluxes = Fluxes, Height = Height, rsq = RSQ))
+}
 ```
 ##Flux SPM function
 A flux of SPM is also calculated (I am not sure this is useful)
 ```{r}
-# FluxSPM <- function(Data = NutEro[NutEro$Speed != 0 & !is.na(NutEro$Turbidity.gl),], Sits, Data.acc = PP[,c(1:3,18:20)]) {
-# 
-# Fluxes <- Sites <- Location <- Reps <- Spee <-Nuts <- Height <- BW <- RSQ <- AICs <- NULL
-# 
-# for (s in Sits){
-#    SS       <- Data[Data$Site == s, ]
-#    Acc <- Data.acc[Data.acc$Site == s, ]
-#    Locat  <- unique(SS$Location)
-# 
-#    for (i in Locat){
-#     Acc.loc <- subset(Acc, Acc$Location == i)
-#     Loc <- subset(SS, Location == i)
-#     repli    <- unique(Loc$Replicate)
-# 
-# for (ir in 1:length(repli)){
-#       r <- repli[ir]
-#       Acc.r <- Acc.loc[ir, ]
-#       Rep <- subset(Loc, Replicate == r)
-#       Sped <- unique(Rep$Speed)
-# 
-#      FN <- NULL
-# 
-#      for (p in 1:length(Sped)) {
-#        sp <- Sped[p]
-#        Spd <- subset(Rep, Speed == sp)
-# 
-#       flux <- lm(Spd$Turbidity.gl ~ Spd$Timed)
-#       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-#       Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
-# 
-#       rsq  <- summary(flux)$adj.r.squared
-#       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-#       Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
-#       FN <- c(FN, Nutflux)
-# 
-#     Fluxes <- c(Fluxes, Nutflux)
-#     Sites <- c(Sites, s)
-#     Location <- c(Location, i)
-#     Reps <- c(Reps, ir)
-#     Spee <- c(Spee, sp)
-#      Nuts <- c(Nuts, "Turbidity.gl")
-#      Height <- c(Height, Acc.r$HeightWat/100)
-#      RSQ <- c(RSQ, rsq)
-#     }}}}
-#    invisible(data.frame(Site = Sites, Location = Location, Nut = Nuts, Rep = Reps, Speed = Spee,Fluxes = Fluxes, Height = Height, rsq = RSQ))
-# }
-# 
-# FluxSpeed <- rbind(FluxSpd(Data = PP[PP$Speed != 0, ],Sits = "PP"), FluxSPM(Data = PP[PP$Speed != 0, ],Sits = "PP"))
+FluxSPM <- function(Data = NutEro[NutEro$Speed != 0 & !is.na(NutEro$Turbidity.gl),], Sits, Data.acc = PP[,c(1:3,18:20)]) {
+
+Fluxes <- Sites <- Location <- Reps <- Spee <-Nuts <- Height <- BW <- RSQ <- AICs <- NULL
+
+for (s in Sits){
+   SS       <- Data[Data$Site == s, ]
+   Acc <- Data.acc[Data.acc$Site == s, ]
+   Locat  <- unique(SS$Location)
+
+   for (i in Locat){
+    Acc.loc <- subset(Acc, Acc$Location == i)
+    Loc <- subset(SS, Location == i)
+    repli    <- unique(Loc$Replicate)
+
+for (ir in 1:length(repli)){
+      r <- repli[ir]
+      Acc.r <- Acc.loc[ir, ]
+      Rep <- subset(Loc, Replicate == r)
+      Sped <- unique(Rep$Speed)
+
+     FN <- NULL
+
+     for (p in 1:length(Sped)) {
+       sp <- Sped[p]
+       Spd <- subset(Rep, Speed == sp)
+
+      flux <- lm(Spd$Turbidity.gl ~ Spd$Timed)
+      prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
+      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
+
+      rsq  <- summary(flux)$adj.r.squared
+      prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
+      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
+      FN <- c(FN, Nutflux)
+
+    Fluxes <- c(Fluxes, Nutflux)
+    Sites <- c(Sites, s)
+    Location <- c(Location, i)
+    Reps <- c(Reps, ir)
+    Spee <- c(Spee, sp)
+     Nuts <- c(Nuts, "Turbidity.gl")
+     Height <- c(Height, Acc.r$HeightWat/100)
+     RSQ <- c(RSQ, rsq)
+    }}}}
+   invisible(data.frame(Site = Sites, Location = Location, Nut = Nuts, Rep = Reps, Speed = Spee,Fluxes = Fluxes, Height = Height, rsq = RSQ))
+}
+
+FluxSpeed <- rbind(FluxSpd(Data = PP[PP$Speed != 0, ],Sits = "PP"), FluxSPM(Data = PP[PP$Speed != 0, ],Sits = "PP"))
 ```
 ##mean nutrient and SPM fluxes per speed dataframe
 ```{r}
-#write.csv(FluxSpeed, "Fluxes erosion per speed.csv")
-FluxperSpeed <- read.csv("Fluxes erosion per speed.csv")[,-1] 
-FluxperSpeed <- aggregate(FluxperSpeed[,6], by = list(Location = FluxperSpeed$Location, Nut = FluxperSpeed$Nut, Speed = FluxperSpeed$Speed), FUN = mean)
+write.csv(FluxSpeed, "../Project generated/Fluxes erosion per speed.csv")
+FluxperSpeed <- read.csv("../Project generated/Fluxes erosion per speed.csv")[,-1] 
+FluxperSpeed <- aggregate(FluxperSpeed[,6], by = list(Location = FluxperSpeed$Location, Nut = FluxperSpeed$Nut, 
+                                                      Speed = FluxperSpeed$Speed), FUN = mean)
  FluxperSpeed[,4] <- round(FluxperSpeed[,4], digits = 2)
  colnames(FluxperSpeed)[4] <- "ExpFlux"
 ```
