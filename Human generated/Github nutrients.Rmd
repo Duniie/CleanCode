@@ -7,38 +7,31 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
 library(dplyr)
 library(plyr)
 library(tidyr)
+library(docstring)
 ```
 Read files
 ```{r}
 PP <- read.csv("../Read Only/PP erosion fluxes.csv")[, -1]
-```
-
-the release of nutrients is NOT linearly related to increase sediment resuspension. Therefore a linear model is not the best way to analyse this data. A spearman analysis is more appropriate for data that presents a monotonic relationship, as it is the case here. 
-For the Spearman analysis we will compare the nutrient concentration vs mass of resuspended sediment (g/L)
-#Spearman analysis NOT INCLUDED IN THIS FILE
-
-#Nutrient Fluxes calculation
-##Nutrient fluxes over time linear model NOT INCLUDED IN this file
-Calculation of nutrient fluxes over the whole duration (~ 1 hour) of the erosion experiment. All speeds included
- NOTE: the fluxes are not linear, they follow a monotonic relationship instead
-
-##Nut Fluxes per speed function 
-Here a different flux is calculated per each speed
-we do not kill points because we only have a maximum of three data points per replicate
-#Unchanging variables
-```{r}
 nut <-  c("NH4", "NO2", "NO3", "PO4", "DSi")
 ```
 
-#Creates dataframe of nutrient released per speed
 ```{r}
-flux_pd <- function(data = NutEro[NutEro$Speed != 0, ], sits, nut,  data_acc = PP[, c(1:3, 18:20)]) {
+
+```
+
+
+
+```{r}
+flux_spd <- function(data = NutEro[NutEro$Speed != 0, ], sits, nut,  data_acc = PP[, c(1:3, 18:20)]) {
+  #'@title Nutrients released per speed
+  #'@description This function plots the release of different nutrients at different time steps and at different speeds. Suspended particulate matter is not included in this function because the scale is different. It returns a graph of the triplicate.
 fluxes <- sites <- location <- reps <- spee <-  nuts <- height <-  rsq <-  NULL
 for (s in sits) {
-   ss       <- data[data$Site == s, ]
+   ss <- data[data$Site == s, ]
    acc <- data_acc[data_acc$Site == s, ]
    locat  <- unique(ss$Location)
 
@@ -59,8 +52,8 @@ for (ir in 1:length(repli)) {
 
      for (p in 1:length(sped)) {
       sp <- sped[p]
-      Spd <- subset(rep, Speed == sp)
-      flux <- lm(spd[,nutname] ~ Spd$Timed)
+      spd <- subset(rep, Speed == sp)
+      flux <- lm(spd[,nutname] ~ spd$Timed)
       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
       Nutflux <- coef(flux)[2]*(acc_r$HeightWat/100)
       rsqs  <- summary(flux)$adj.r.squared
@@ -72,79 +65,65 @@ for (ir in 1:length(repli)) {
       location <- c(location, i)
       reps <- c(reps, ir)
       spee <- c(spee, sp)
-      nuts <- c(nuts, Nutname)
+      nuts <- c(nuts, nutname)
       height <- c(height, acc_r$HeightWat/100)
       rsq <- c(rsq, rsqs)
     }}}}}
    invisible(data.frame(Site = sites, Location = location, Nut = nuts, Rep = reps, Speed = spee, Fluxes = fluxes, Height = height, rsq = rsq))
 }
 ```
+
 ```{r}
+FluxSPM <- function(data = NutEro[NutEro$Speed != 0 & !is.na(NutEro$Turbidity.gl),], sits, data_acc = PP[,c(1:3,18:20)]) {
+  #'@Title Suspended matter released per speed
+  #'@Description this function plots the concentration of suspended matter released at different speeds and time steps
+fluxes <- sites <- location <- reps <- spee <-  nuts <- height <-  rsq <-  NULL
 
-tryCatch({
-  do_something_that_might_go_wrong(PP$Minutes + PP$Estuary)
-}, error = function(Estuary){
-  is.numeric(Estuary)
-}, finally = {
-  cleanup(PP$Minutes
-          )
-})
+for (s in sits){
+   ss       <- data[data$Site == s, ]
+   acc <- data_acc[data_acc$Site == s, ]
+   locat  <- unique(ss$location)
 
-```
-
-##Flux SPM function
-A flux of SPM is also calculated (I am not sure this is useful)
-```{r}
-FluxSPM <- function(Data = NutEro[NutEro$Speed != 0 & !is.na(NutEro$Turbidity.gl),], Sits, Data.acc = PP[,c(1:3,18:20)]) {
-
-Fluxes <- Sites <- Location <- Reps <- Spee <-Nuts <- Height <- BW <- RSQ <- AICs <- NULL
-
-for (s in Sits){
-   SS       <- Data[Data$Site == s, ]
-   Acc <- Data.acc[Data.acc$Site == s, ]
-   Locat  <- unique(SS$Location)
-
-   for (i in Locat){
-    Acc.loc <- subset(Acc, Acc$Location == i)
-    Loc <- subset(SS, Location == i)
+   for (i in locat){
+    acc_loc <- subset(acc, acc$Location == i)
+    loc <- subset(SS, Location == i)
     repli    <- unique(Loc$Replicate)
 
 for (ir in 1:length(repli)){
       r <- repli[ir]
-      Acc.r <- Acc.loc[ir, ]
-      Rep <- subset(Loc, Replicate == r)
-      Sped <- unique(Rep$Speed)
+      acc_r <- acc_loc[ir, ]
+      rep <- subset(loc, Replicate == r)
+      sped <- unique(Rep$Speed)
 
-     FN <- NULL
+     fn <- NULL
 
      for (p in 1:length(Sped)) {
        sp <- Sped[p]
-       Spd <- subset(Rep, Speed == sp)
+       spd <- subset(rep, Speed == sp)
 
-      flux <- lm(Spd$Turbidity.gl ~ Spd$Timed)
+      flux <- lm(spd$Turbidity.gl ~ spd$Timed)
       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
+      nutflux <- coef(flux)[2]*(acc_r$HeightWat/100)
 
-      rsq  <- summary(flux)$adj.r.squared
+      rsqs  <- summary(flux)$adj.r.squared
       prob <- summary(flux)$coefficients[2,"Pr(>|t|)"]
-      Nutflux <- coef(flux)[2]*(Acc.r$HeightWat/100)
-      FN <- c(FN, Nutflux)
+      nutflux <- coef(flux)[2]*(acc_r$HeightWat/100)
+      fn <- c(fn, Nutflux)
 
-    Fluxes <- c(Fluxes, Nutflux)
-    Sites <- c(Sites, s)
-    Location <- c(Location, i)
-    Reps <- c(Reps, ir)
-    Spee <- c(Spee, sp)
-     Nuts <- c(Nuts, "Turbidity.gl")
-     Height <- c(Height, Acc.r$HeightWat/100)
-     RSQ <- c(RSQ, rsq)
+    fluxes <- c(fluxes, nutflux)
+    sites <- c(sites, s)
+    location <- c(location, i)
+    reps <- c(reps, ir)
+    spee <- c(spee, sp)
+     nuts <- c(nuts, "Turbidity.gl")
+     height <- c(height, acc_r$HeightWat/100)
+     rsq <- c(rsq, rsqs)
     }}}}
-   invisible(data.frame(Site = Sites, Location = Location, Nut = Nuts, Rep = Reps, Speed = Spee,Fluxes = Fluxes, Height = Height, rsq = RSQ))
+   invisible(data.frame(Site = sites, Location = location, Nut = nuts, Rep = reps, Speed = spee, Fluxes = fluxes, Height = height, rsq = rsq))
 }
 
-FluxSpeed <- rbind(FluxSpd(Data = PP[PP$Speed != 0, ],Sits = "PP"), FluxSPM(Data = PP[PP$Speed != 0, ],Sits = "PP"))
+FluxSpeed <- rbind(flux_spd(data = PP[PP$Speed != 0, ],sits = "PP", nut = nut), FluxSPM(data = PP[PP$Speed != 0, ],sits = "PP"))
 ```
-##mean nutrient and SPM fluxes per speed dataframe
 ```{r}
 write.csv(FluxSpeed, "../Project generated/Fluxes erosion per speed.csv")
 fluxper_speed <- read.csv("../Project generated/Fluxes erosion per speed.csv")[, -1] 
@@ -152,15 +131,16 @@ fluxper_speed <- aggregate(fluxper_speed[, 6], by = list(Location = fluxper_spee
 fluxper_speed[, 4] <- round(fluxper_speed[, 4], digits = 2)
 colnames(fluxper_speed)[4] <- "ExpFlux"
 ```
-#Plot of nutrients release over time all triplicates PP
+
 ```{r fig.height=5, fig.width=15}
-plotreltur <- function(Data, Station, nut = c("NH4", "NO2", "PO4"), col, SPD = FluxperSpeed){#"NO3", "DSi", these nutrients are not interesting
+#These plots are not including the nutrients of nitrate (NO3) and DSi because they did not show a clear correlation between erosion and changes in the concentration in the water column.
+plotreltur <- function(Data, Station, nut = c("NH4", "NO2", "PO4"), col, SPD = fluxper_speed){
   Sites <- Data[Data$Site == Station, ]
   Loc <- unique(Data$Location)
   Rep <- unique(Data$Replicate)
   SPDSit <- SPD[SPD$Site == Station, ]
 
-#png(paste0("../graphs/",Station, "SpeedFlux.png"),width = 900, height = 280)
+png(paste0("../Project generated/",Station, "SpeedFlux.png"),width = 900, height = 280)
      
   par(mfrow = c(1,4), mar = c(2, 2, 3, 2), oma = c(4,4,4,2))
   for (n in 1:length(nut)){
@@ -189,7 +169,7 @@ plotreltur <- function(Data, Station, nut = c("NH4", "NO2", "PO4"), col, SPD = F
       axis(side =3, line = -2.3, at = c(5,8,11), labels = SPDLoc$ExpFlux[SPDLoc$Location == 25], col.axis = col[Loc == m], cex.axis = 1.2, tick = F)} else if(m == 200) {
       axis(side =3, line = -3.3, at = c(5,8,11), labels = SPDLoc$ExpFlux[SPDLoc$Location == 200], col.axis = col[Loc == m], cex.axis = 1.2, tick = F)} 
   }}
-  #plotting turbidity
+
   plot(y = Sites[, "Turbidity.gl"], x = Sites$Sample.num, xaxt= "n", type = "n",
            xlab = " ", main = expression('SPM g L'^"-1"), ylab = "g/L", cex.main = 2.1, cex.axis = 1.3, cex.lab = 2)
   SPDNut <- SPD[SPD$Nut == "Turbidity.gl",]
@@ -214,7 +194,7 @@ plotreltur <- function(Data, Station, nut = c("NH4", "NO2", "PO4"), col, SPD = F
   mtext(outer = TRUE, side = 2, line = 1, expression('mmol m'^"-3"), cex = 1.5)
   
   legend("left", text.col = match(Loc, c("200", "25")), cex = 1.4, bty = "n", legend = Loc ) 
-  #dev.off()
+  dev.off()
 }
  
 color <- c("red", "black")
@@ -223,58 +203,3 @@ PP <- PP[order(PP[,6]),]
 plotreltur(Data = PP, Station = "PP", col = color)
  
 ```
-#Calculation of normal fluxes vs erosion fluxes
-
-Here we divide the erosion flux (mmol/m^2/d) by the normal erosion flux(mmol/m^2/d) to get an equivalence of how many days we would need to get fluxes equivalent to those from the erosion.
-```{r}
-# Fluxes <- read.csv("../../Incubations/processed_data/Nutrient O2 Fluxes.csv")[,-1]
-# MeanFluxes <- aggregate(Fluxes[,c(5:20)], by = list(Site = Fluxes$Site, Location = Fluxes$Location), FUN = mean)
-# BGFluxPP <- MeanFluxes[MeanFluxes$Site == "PP",]
-# colnames(BGFluxPP)[c(3,7,9,11,15,17)] <- c("O2flux", "NH4", "NO2", "NO3", "PO4", "DSi")
-# FluxesPP <- reshape(BGFluxPP[,c(1,2,7,9,11,15,17)], varying = list(colnames(BGFluxPP)[c(7,9,11,15,17)]), idvar =  "Location", v.names = "Flux", times = colnames(BGFluxPP)[c(7,9,11,15,17)],direction = "long")
-# colnames(FluxesPP)[3] <- "Nut"
-# 
-# EroNorFluxes <- merge(FluxperSpeed, FluxesPP[,-1], by = c("Location", "Nut" )) #MeanFluxes data from Incubation Nuts O2.Rmd
-# 
-# EroNorFluxes$equivFlux <- EroNorFluxes$ExpFlux/EroNorFluxes$Flux
-# EroNorFluxes$equivFlux[EroNorFluxes$equivFlux < 0] <- "NA"  #both the experiment and normal fluxes need to have the same direction or this does not make sense
-
-#write.csv(EroNorFluxes, "../processed_data/Equivalent fluxes.csv")
-EquivFluxes <- read.csv("../processed_data/Equivalent fluxes.csv")[,-1]
-####It would be days because one unit of flux happens over one day, so even if we cancel the units it would be equivalent to days
-```
-#To recreate Justins calculation I have calculated the delta in concentration per speed. C2-C1. I will then use this to calculate what is the equivalent in days of fluxes
-```{r}
-MeanEro <- data.frame(aggregate(PP[,c("NH4", "NO2", "NO3", "PO4", "DSi", 'Turbidity.gl')], list(Location = PP$Location, Velocity = PP$Velocity.ms, Sample.num = PP$Sample.num), FUN = mean, na.rm = T))
-FLNut <- MeanEro[MeanEro$Sample.num %in% c(1,3,4,6,7,9,10,12),]
- #only taking first and third measurement per speed
-Delta <- FLNut %>%
-  arrange(Location, Sample.num)%>%
-   gather(key = "Nut", value = "SpeedFlux", c("NH4", "NO2", "NO3", "PO4", "DSi")) %>%
-    mutate(diff = SpeedFlux - lag(SpeedFlux, default = first(SpeedFlux)))%>%
-  .[.$Sample.num %in% c(3,6,9,12),]
-
-DeltaNorFlux <- merge(Delta, unique(EquivFluxes[,c(1,2,5)]), by = c("Location", "Nut" ), no.dups = T) #MMerging equivalent fluxes and normal fluxes
-
-```
-#calculation of release (difference between C2-C1 per speed) and its equivalence in hours of daily fluxes
-```{r}
- DeltaNorFlux$daysofFlux <- DeltaNorFlux$diff / DeltaNorFlux$Flux
- DeltaNorFlux$HoursnatFlux <- DeltaNorFlux$diff/(DeltaNorFlux$Flux / 24)
- 
- ##Justins code example
-# conc.sqm2 = function(conc, Flux=1){
-#     sa =pi*0.125^2 # surface area of sediment core  25 cm diameter
-#     WH = 0.26
-#     V = sa*WH # Volume (L)
-#     delta = conc*WH
-#     #deltaSD = SD*WH #turn on for SD
-#     #print((conc*V)/sa) # also works to convert conc change
-#     print(c(delta, "change in mmol/m2")) 
-#     print(c(delta/Flux,"days of natural flux"))
-#     print(c(delta/(Flux/24),"hours of natural flux"))
-# }
-```
-
-
-
