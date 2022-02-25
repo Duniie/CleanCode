@@ -6,11 +6,20 @@ At each location we placed a cilinder with a turbine on top to erode the sedimen
 As soon as we started increasing the speed of the turbine the sediment started eroding. Thereafter we took water samples to measure how much nutrients were being released into the water column.
 This code is part of the data analysis where we investigate the relationship between speed, time and nutrients released.
 
-#Installation
+Installation
 Prerequisites
-Libraries:
-tidyverse
-docstring
+R version 4.1.2 (2021-11-01)
+Platform: aarch64-apple-darwin20 (64-bit)
+Running under: macOS Big Sur 11.6
+
+Matrix products: default
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRlapack.dylib
+
+locale:
+en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+stats     graphics  grDevices utils     datasets  methods   base     
 
 To run this project please clone it into your desktop
 
