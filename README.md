@@ -6,13 +6,15 @@ At each location we placed a cilinder with a turbine on top to erode the sedimen
 As soon as we started increasing the speed of the turbine the sediment started eroding. Thereafter we took water samples to measure how much nutrients were being released into the water column.
 This code is part of the data analysis where we investigate the relationship between speed, time and nutrients released.
 
-##Installation
+#Installation
 Prerequisites
 Libraries:
 tidyverse
 docstring
 
-Files manifest:
+To run this project please clone it into your desktop
+
+#Files manifest:
 Read only
   Raw data
 Human generated
