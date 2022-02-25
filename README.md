@@ -9,7 +9,9 @@ This code is part of the data analysis where we investigate the relationship bet
 Installation
 Prerequisites
 R version 4.1.2 (2021-11-01)
+
 Platform: aarch64-apple-darwin20 (64-bit)
+
 Running under: macOS Big Sur 11.6
 
 Matrix products: default
