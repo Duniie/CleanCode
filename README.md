@@ -6,3 +6,20 @@ At each location we placed a cilinder with a turbine on top to erode the sedimen
 As soon as we started increasing the speed of the turbine the sediment started eroding. Thereafter we took water samples to measure how much nutrients were being released into the water column.
 This code is part of the data analysis where we investigate the relationship between speed, time and nutrients released.
 
+##Installation
+Prerequisites
+Libraries:
+tidyverse
+docstring
+
+Files manifest:
+Read only
+  Raw data
+Human generated
+  Data processing code
+  Data analysis code
+Project generated output
+License
+
+This project was created by Dunia Rios Yunes from the Royal Netherlands Institute for Sea Research as part of the project "Deltas under transition"
+
